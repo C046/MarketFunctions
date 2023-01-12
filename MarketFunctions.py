@@ -9,17 +9,28 @@ import numpy as np
 
 
 # GROWTH RATE
-def _gr(InitialEPSValue,FinalEPSValue):
+def _gr(InitialEPSValue,FinalEPSValue=False):    
     # Define A Generator To Speed Up The Code
     def _GR(InitialEPSValue, FinalEPSValue):
         while True:
             # Subtract FinalEPSValue With InitialEPSValue then divide it by the InitialEPSValue
             yield [((np.subtract(fv,iv))/iv) for fv,iv in zip(FinalEPSValue,cycle(InitialEPSValue))]
       
-    # Automate The Generator So That You Can Write Less Code
-    for i in _GR(InitialEPSValue, FinalEPSValue):
-        return i
+    def _singleGR(InitialEPSValue):
+        while True:
+            yield [((np.subtract(y,x))/x) for x,y in zip(InitialEPSValue[:-1], cycle(InitialEPSValue[1:]))]
+            
+            
+    if FinalEPSValue != False:
+        # Automate The Generator So That You Can Write Less Code
+        for i in _GR(InitialEPSValue, FinalEPSValue):
+            return i
     
+    if FinalEPSValue == False:
+        # Automate The Generator So That You Can Write Less Code
+        for i in _singleGR(InitialEPSValue):
+            return i
+        
     
 # PE RATIO
 def _pe(MarketValuePerShare,EarningsPerShare):
@@ -53,7 +64,7 @@ def _eps(NetIncome,PreferredDividends,AverageOutstandingCommonShares):
     def _EPS(NetIncome,PreferredDividends,AverageOutstandingCommonShares):
         while True:
             # Subtract NetIncome With Preferred Dividends Then Divide By the AverageOutstandingShares
-            yield [((np.subtract(ni,_pd))/aocs) for ni,_pd,aocs in zip(NetIncome,PreferredDividends,cycle(AverageOutstandingCommonShares))]
+            yield [((np.subtract(ni,_pd))/aocs) for ni,_pd,aocs in zip(NetIncome,cycle(PreferredDividends),cycle(AverageOutstandingCommonShares))]
       
     # Automate The Generator So That You Can Write Less Code
     for i in _EPS(NetIncome,PreferredDividends,AverageOutstandingCommonShares):
@@ -66,7 +77,7 @@ def _iv(eps,r,pe):
     def _INT(eps,r,pe):
         while True:
             # Add 1 to R Then Multiply EPS With R, Multiply This Value With PE Value
-            yield [np.multiply(np.multiply(EPS,(1+R)),PE) for EPS,R,PE in zip(eps,r,cycle(pe))]
+            yield [np.multiply(np.multiply(EPS,(1+R)),PE) for EPS,R,PE in zip(eps,cycle(r),cycle(pe))]
     
     # Automate The Generator So That You Can Write Less Code
     for i in _INT(eps,r,pe):
@@ -79,11 +90,10 @@ def _iv(eps,r,pe):
    
         
 
-NetIncome,PreferredDividends,AverageOutstandingCommonShares = [4,5,6,1,2,3],[3,2,1,5,4,12],[4,5,6,1,2,3]
+NetIncome,PreferredDividends,AverageOutstandingCommonShares,MarketValuePerShare = [4,5,6,1,2,3],[3,2,1,5,4,12],[4,5,6,1,2,3],[4,5,6,1,2,3]
 EPS = _eps(NetIncome,PreferredDividends,AverageOutstandingCommonShares)
-MarketValuePerShare =[4,5,6,1,2,3]
 PE = _pe(MarketValuePerShare,EPS)
-ProjectedGrowthInEarnings = [4,5,6,1,2,3]
+ProjectedGrowthInEarnings = _gr(EPS)
 
 R = _r(PE,ProjectedGrowthInEarnings)
 
