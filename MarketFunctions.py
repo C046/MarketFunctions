@@ -16,9 +16,10 @@ def _gr(InitialEPSValue,FinalEPSValue=False):
             # Subtract FinalEPSValue With InitialEPSValue then divide it by the InitialEPSValue
             yield [((np.subtract(fv,iv))/iv) for fv,iv in zip(FinalEPSValue,cycle(InitialEPSValue))]
       
+        
     def _singleGR(InitialEPSValue):
         while True:
-            yield [((np.subtract(y,x))/x) for x,y in zip(InitialEPSValue[:-1], cycle(InitialEPSValue[1:]))]
+            yield [((np.subtract(fv,iv))/iv) for iv,fv in zip(InitialEPSValue[:-1], cycle(InitialEPSValue[1:]))]
             
             
     if FinalEPSValue != False:
@@ -89,13 +90,15 @@ def _iv(eps,r,pe):
   
    
         
+# Establish arbitrary values
+# This will take a total of 4 requests from an api.
+NetIncome,PreferredDividends,AverageOutstandingCommonShares,MarketValuePerShare = [4,5,6,1,2,3],[3,2,1,5],[4,5,6,1,2,3],[4,5,6,1,2,3]
 
-NetIncome,PreferredDividends,AverageOutstandingCommonShares,MarketValuePerShare = [4,5,6,1,2,3],[3,2,1,5,4,12],[4,5,6,1,2,3],[4,5,6,1,2,3]
+# Calculate on values
 EPS = _eps(NetIncome,PreferredDividends,AverageOutstandingCommonShares)
 PE = _pe(MarketValuePerShare,EPS)
 ProjectedGrowthInEarnings = _gr(EPS)
-
 R = _r(PE,ProjectedGrowthInEarnings)
 
-
+# Finally return an intrinsic value
 Intrinsic_value = _iv(EPS,R,PE)
