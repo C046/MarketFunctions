@@ -4,6 +4,7 @@ Created on Fri Jan 13 18:32:12 2023
 
 @author: hadaw
 """
+""" This function is purely speculative, and is my own math. """
 import numpy as np
 import requests
 from MarketFunctions import _iv, _eps, _r, _gr,_pe
