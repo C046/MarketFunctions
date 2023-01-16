@@ -145,53 +145,38 @@ commonStockSharesOutstanding = [float(i) for i in commonStockSharesOutstanding]
 
 eps = _eps(NetIncome,P_Div,commonStockSharesOutstanding)
 pe = _pe(MarketValuePerShare, eps)
-
-# # pe_low = _pe(MarketValuePerShare_low,eps)
-# # pe_high = _pe(MarketValuePerShare_high,eps)
-
-# PE = np.average([np.average(pe_low),np.average(pe_high)])
-
-
 ProjectedGrowthInEarnings = _gr(eps)
 r = _r(pe,ProjectedGrowthInEarnings)
-
-# r+ProjectedGrowthInEarnings+pe+eps+commonStockSharesOutstanding+P_Div+NetIncome+MarketValuePerShare
-#r_high = _r(pe_high,ProjectedGrowthInEarnings)
 
 
 
 # Automate your brain.
 if eps == 0.0:
     eps = -0.000000000000000000000000000000000000000000000000000000000000000001
-# log_this = np.average([MarketValuePerShare+ NetIncome+ P_Div+ commonStockSharesOutstanding+ eps+pe+ProjectedGrowthInEarnings+r])
-# if log_this <=0:
-#     log_this = log_this*-1
-# c = math.sqrt(math.log(log_this)**2)
-
 
 if (_iv(eps,r,pe) - np.average(eps)) <=0:
-    x = (_iv(eps,r,pe) - np.average(eps))*-1
+    top = (_iv(eps,r,pe) - np.average(eps))*-1
 else:
-    x = _iv(eps,r,pe) - np.average(eps)
+    top = _iv(eps,r,pe) - np.average(eps)
     
-top = math.log(math.sqrt(x))**2#(np.average(np.average(ProjectedGrowthInEarnings)))
+top = math.log(math.sqrt(top))**2
 bottom = math.log((np.average(commonStockSharesOutstanding) - np.average(eps))**np.average(ProjectedGrowthInEarnings))**2
 
 if top/(math.sqrt(math.log(bottom))**2) <= 95:
     res = (top/(math.sqrt(math.log(bottom))**2))**2
     sure = res*sureness
-    if sureness >=0.5:
+    if sureness >=0.501:
         res = res+sure+sure
-    if sureness <=0.3:
+    if sureness <=0.499:
         res = res-sure
     
     print(f"\n Your intrinsic value share price for {symbol} is: {res}")
 if top/(math.sqrt(math.log(bottom))**2) >= 95:
     res = top/(math.sqrt(math.log(bottom))**2)
     sure = res*sureness
-    if sureness >=0.5:
+    if sureness >=0.501:
         res = res+sure+sure
-    if sureness <=0.3:
+    if sureness <=0.499:
         res = res-sure
         
     
